@@ -81,18 +81,31 @@ form.addEventListener('submit', (e) => {
     return;
   }
 
-  // Simulate send (replace with actual API/Formspree integration)
   const btn = form.querySelector('button[type="submit"]');
   btn.disabled = true;
   btn.querySelector('span').textContent = 'Enviando…';
 
-  setTimeout(() => {
-    successMsg.classList.add('show');
-    form.reset();
+  const data = new FormData(form);
+
+  fetch('https://formspree.io/f/xrejlyvz', {
+    method: 'POST',
+    body: data,
+    headers: { 'Accept': 'application/json' }
+  })
+  .then(res => {
+    if (res.ok) {
+      successMsg.classList.add('show');
+      form.reset();
+      setTimeout(() => successMsg.classList.remove('show'), 6000);
+    } else {
+      alert('Erro ao enviar. Tente novamente.');
+    }
+  })
+  .catch(() => alert('Erro de conexão. Verifique sua internet.'))
+  .finally(() => {
     btn.disabled = false;
     btn.querySelector('span').textContent = 'Enviar mensagem';
-    setTimeout(() => successMsg.classList.remove('show'), 6000);
-  }, 1200);
+  });
 });
 
 function isValidEmail(email) {
